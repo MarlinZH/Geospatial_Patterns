@@ -13,4 +13,3 @@ def point_finder(place,tags):
     :param tags(dict):key value of entity attribute in OSM and value
     :return: results(DataFrame): table of latitude and longitude with entity value
     '''
-    test
