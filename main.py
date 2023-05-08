@@ -13,3 +13,17 @@ def point_finder(place,tags):
     :param tags(dict):key value of entity attribute in OSM and value
     :return: results(DataFrame): table of latitude and longitude with entity value
     '''
+    gdf = osmnx.geocode_to_gdf(place)
+    bounding = gdf.bounds
+    north, south, east , west = bounding.iloc[0,3], bounding.iloc[0,1], bounding.iloc[0,2], bounding.iloc[0,0]
+    location = gdf.geometry.unarty_union
+
+    point = osmnx.geometries_from_bbox(north,
+                                       south,
+                                       east,
+                                       west,
+                                       tags = tags)
+    points.set_crs(crs=4326)
+    point = point[point.geometry.within(location)]
+
+    point['geometry'] = point[geometry].apply(lambda x:x.centroid if type(x) == Polygon else x)
