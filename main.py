@@ -14,9 +14,9 @@ def point_finder(place,tags):
     :return: results(DataFrame): table of latitude and longitude with entity value
     '''
     gdf = osmnx.geocode_to_gdf(place)
-    print(gdf)
+    print('GDF:',gdf)
     bounding = gdf.bounds
-    print(bounding)
+    print('BOUNDING:',bounding)
     north, south, east, west = bounding.iloc[0, 3], bounding.iloc[0, 1], bounding.iloc[0, 2], bounding.iloc[0, 0]
     print('North:{},South:{},East:{},West{}'.format(north,south,east,west))
     location = gdf.unary_union
