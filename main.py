@@ -22,7 +22,7 @@ def point_finder(place,tags):
     # location = gdf.unary_union
     # print(location)
     p = {'name':[place],'geometry':[north,south,east,west]}
-    point = gpd.GeoDataFrame(p,crs="EPSG:4326")
+    point = gpd.GeoDataFrame(p['name'],geometry=p['geometry'])
     # tags = tags)
     print('THIS IS THE POINT')
     # point.set_crs(4326)
