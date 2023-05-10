@@ -13,13 +13,15 @@ def point_finder(place,tags):
     :param tags(dict):key value of entity attribute in OSM and value
     :return: results(DataFrame): table of latitude and longitude with entity value
     '''
+    #Creates GeoDataframe of longitude and Latitude of place
     gdf = osmnx.geocode_to_gdf(place)
     print('GDF:',gdf)
+    #Gets the bounding box of the gdf GeoDataFrame
     bounding = gdf.bounds
-    grid = bounding.un
     print('BOUNDING:',bounding)
     north, south, east, west = bounding.iloc[0, 3], bounding.iloc[0, 1], bounding.iloc[0, 2], bounding.iloc[0, 0]
     print('North: {},South: {},East: {},West: {}'.format(north,south,east,west))
+    #Find Points within the are polygon
     p = gpd.GeoDataFrame({'name':['North','South','East','West'],'geometry':[north,south,east,west]})
     print(p)
     # point = osmnx.geometries_from_bbox(north,south,east, west, tags)
