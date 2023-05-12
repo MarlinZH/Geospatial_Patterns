@@ -48,16 +48,20 @@ def area_entities(area,tags):
     point = point[point.geom_type != 'MultiPolygon']
     point = point[point.geom_type != 'Polygon']
 
-    results = pd.DataFrame({'name': list(point['name']),
-                            'brand': list(point['brand:en']),
+    entities_list = pd.DataFrame({'OSM Tag': list(tags.values())[0],
+                            'Brand': list(point['brand:en']),
                             'longitude': list(point['geometry'].x),
                             'latitude': list(point['geometry'].y)})
-    results['name'] = list(tags.values())[0]
-    print(results)
-    counrer = results['brand'].value_counts()
-    print(counrer)
 
-    results = results.groupby('brand').apply(print)
-    return results
+    #print(entities_list)
+
+    entity_count = entities_list['Brand'].value_counts()
+    print(entity_count)
+
+    entities_list = entities_list.groupby('Brand')
+    entity_list_output = entities_list.apply(print)
+
+    return entity_count, entities_list
+
 
 convenience_stores = area_entities(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
