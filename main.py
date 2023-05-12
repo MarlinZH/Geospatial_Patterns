@@ -5,6 +5,7 @@ import shapely
 import pandas as pd
 import numpy as np
 import networkx as nx
+import matplotlib.pyplot as plt
 
 def area_boundries(area):
     '''
@@ -26,7 +27,7 @@ def area_boundries(area):
     location = gdf.unary_union
     #print('Location:',location)
     return north,south,east,west,location
-def area_entities(area,tags):
+def area_entities(area,tags,verbose = None):
     '''
     Returns a dataframe of coordinates of an entity from OSM.
     :param area(str): A location
@@ -59,7 +60,8 @@ def area_entities(area,tags):
     print(entity_count)
 
     entities_list = entities_list.groupby('Brand')
-    entity_list_output = entities_list.apply(print)
+    if verbose == 'yes':
+        entity_list_output = entities_list.apply(print)
 
     return entity_count, entities_list
 
