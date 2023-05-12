@@ -72,5 +72,7 @@ def area_entities_count(area,tags):
 
 convenience_stores = area_entities_count(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
 count_visualized = convenience_stores.plot(kind='barh')
+plt.pie(convenience_stores,labels=convenience_stores.values)
+plt.legend(convenience_stores.index)
 print(count_visualized)
 
