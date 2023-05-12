@@ -27,7 +27,7 @@ def area_boundries(area):
     location = gdf.unary_union
     #print('Location:',location)
     return north,south,east,west,location
-def area_entities(area,tags,verbose = None):
+def area_entities_list(area,tags,output = 'yes'):
     '''
     Returns a dataframe of coordinates of an entity from OSM.
     :param area(str): A location
@@ -54,16 +54,23 @@ def area_entities(area,tags,verbose = None):
                             'longitude': list(point['geometry'].x),
                             'latitude': list(point['geometry'].y)})
 
-    #print(entities_list)
 
-    entity_count = entities_list['Brand'].value_counts()
-    print(entity_count)
-
-    entities_list = entities_list.groupby('Brand')
-    if verbose == 'yes':
+    if output == 'yes':
+        entities_list = entities_list.groupby('Brand')
         entity_list_output = entities_list.apply(print)
+        print('Entities Successfully Listed')
+    else:
+        print('Entities Successfully Identified')
 
-    return entity_count, entities_list
+    return entities_list
+def area_entities_count(area,tags):
 
+    entity_list = area_entities_list(area,tags,output='no')
+    entity_count = entity_list['Brand'].value_counts()
+    print(entity_count)
+    return entity_count
 
-convenience_stores = area_entities(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
+convenience_stores = area_entities_count(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
+count_visualized = convenience_stores.plot(kind='barh')
+print(count_visualized)
+
