@@ -76,3 +76,5 @@ plt.pie(convenience_stores,labels=convenience_stores.values)
 plt.legend(convenience_stores.index)
 print(count_visualized)
 
+#Convert location to radians
+locations = convenience_stores
