@@ -70,11 +70,9 @@ def area_entities_count(area,tags):
     print(entity_count)
     return entity_count
 
-convenience_stores = area_entities_count(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
-count_visualized = convenience_stores.plot(kind='barh')
-plt.pie(convenience_stores,labels=convenience_stores.values)
-plt.legend(convenience_stores.index)
-print(count_visualized)
-
+entities_in_area = area_entities_count(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
+plt.pie(entities_in_area,labels=entities_in_area.values)
+plt.legend(entities_in_area.index)
+entities_list = area_entities_list(area='Shinjuku,Tokyo',tags={"shop":"convenience"})
 #Convert location to radians
-locations = convenience_stores
+locations = entities_list
