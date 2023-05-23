@@ -81,4 +81,10 @@ print( entities_list)
 locations = entities_list[["latitude","longitude"]].values
 locations_radians = np.radians(locations) 
 #Create a balltree to search locations
-tree = BallTree(locations_radians,leaf_size=15,metric='haversine')  
+tree = BallTree(locations_radians,leaf_size=15,metric='haversine')
+#Find Nearest neighbors in a 2 minute walking radius
+is_within, distances = tree.query_radius(locations_radians, r=168/6371000,count_only=False, return_distance=True)
+#Replace the neighbor induces with store names
+df = pd.DataFrame(is_within)
+df.columns = ['indices']
+df['indices']=[[val for val in row if val != idx] for idx,row in enumerate(df['indices'])] 
