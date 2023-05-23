@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+from sklearn.neighbors import BallTree
+
 
 def area_boundries(area):
     '''
@@ -73,7 +75,10 @@ def area_entities_count(area,tags):
 entities_in_area = area_entities_count(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
 plt.pie(entities_in_area,labels=entities_in_area.values)
 plt.legend(entities_in_area.index)
-entities_list = area_entities_list(area='Shinjuku,Tokyo',tags={"shop":"convenience"})
+entities_list = area_entities_list(area='Shinjuku,Tokyo',tags={"shop":"convenience"},output='no')
+print( entities_list)
 #Convert location to radians
 locations = entities_list[["latitude","longitude"]].values
-locations_radians = np.radians(locations)   
+locations_radians = np.radians(locations) 
+#Create a balltree to search locations
+tree = BallTree(locations_radians,leaf_size=15,metric='haversine')  
