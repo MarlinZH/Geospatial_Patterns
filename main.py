@@ -75,4 +75,5 @@ plt.pie(entities_in_area,labels=entities_in_area.values)
 plt.legend(entities_in_area.index)
 entities_list = area_entities_list(area='Shinjuku,Tokyo',tags={"shop":"convenience"})
 #Convert location to radians
-locations = entities_list
+locations = entities_list[["latitude","longitude"]].values
+locations_radians = np.radians(locations)   
