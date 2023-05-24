@@ -88,3 +88,5 @@ is_within, distances = tree.query_radius(locations_radians, r=168/6371000,count_
 df = pd.DataFrame(is_within)
 df.columns = ['indices']
 df['indices']=[[val for val in row if val != idx] for idx,row in enumerate(df['indices'])] 
+#Create temporary index column
+ent
