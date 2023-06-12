@@ -91,3 +91,4 @@ df['indices']=[[val for val in row if val != idx] for idx,row in enumerate(df['i
 #Create temporary index column
 entities_list = entities_list.reset_index()
 #Set trmporary index column
+print(df[1])
