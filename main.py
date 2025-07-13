@@ -91,5 +91,11 @@ df['indices']=[[val for val in row if val != idx] for idx,row in enumerate(df['i
 #Create temporary index column
 entities_list = entities_list.reset_index()
 #Set Temporary Index Colimn as Index
--
+entities_list.set_index('index', inplace=True)
+#Replace the indices with store names
+
+df['indices'] = df['indices'].apply(lambda x: [entities_list.loc[i, 'Brand'] for i in x])
+#Print the DataFrame with store names
+print(df)
+
 #Search Criteria
