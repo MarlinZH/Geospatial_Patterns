@@ -1,101 +1,101 @@
-import geopandas as gpd
-from shapely.geometry import point, polygon
-import osmnx
-import shapely
-import pandas as pd
-import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
-from sklearn.neighbors import BallTree
+"""
+Geospatial Patterns - Main Script
+Example usage of the GeospatialAnalyzer class
+
+This script demonstrates the basic functionality of analyzing spatial patterns
+of convenience stores in Shinjuku, Tokyo.
+"""
+
+from geospatial_analysis import GeospatialAnalyzer
 
 
-def area_boundries(area):
-    '''
-    Returns the boundary points of an Area bound to cardinal directions
-    :param area:
-    :return:
-    '''
-    #Creates GeoDataframe of longitude and Latitude of place
-    gdf = osmnx.geocode_to_gdf(area)
-    #print('Area GeoDataFrame:',gdf)
+def main():
+    """
+    Main function demonstrating the GeospatialAnalyzer usage.
+    """
+    print("=" * 70)
+    print("Geospatial Patterns Analyzer - Example Analysis")
+    print("=" * 70)
+    
+    # Configure analysis parameters
+    config = {
+        'area': 'Shinjuku, Tokyo',
+        'tags': {"shop": "convenience"},
+        'walking_radius_meters': 168,  # approximately 2 minutes walking distance
+        'output_verbose': True
+    }
+    
+    # Initialize the analyzer
+    print(f"\nAnalyzing: {config['area']}")
+    print(f"Entity Type: {list(config['tags'].keys())[0]} = {list(config['tags'].values())[0]}")
+    print(f"Walking Radius: {config['walking_radius_meters']} meters")
+    
+    analyzer = GeospatialAnalyzer(**config)
+    
+    # Perform entity analysis
+    print("\n" + "=" * 70)
+    print("STEP 1: ENTITY COUNT ANALYSIS")
+    print("=" * 70)
+    entity_counts = analyzer.get_entity_counts()
+    
+    # Perform proximity analysis
+    print("\n" + "=" * 70)
+    print("STEP 2: PROXIMITY ANALYSIS")
+    print("=" * 70)
+    proximity_results = analyzer.analyze_proximity(return_distances=False)
+    
+    # Display sample results
+    print("\nSample Results (First 5 entities):")
+    print("-" * 70)
+    sample = proximity_results[['Entity', 'Neighbor_Count', 'Neighbors']].head()
+    for idx, row in sample.iterrows():
+        print(f"\n{row['Entity']}:")
+        print(f"  - Neighbors within {config['walking_radius_meters']}m: {row['Neighbor_Count']}")
+        if row['Neighbor_Count'] > 0:
+            print(f"  - Nearby stores: {', '.join(row['Neighbors'][:3])}" + 
+                  ("..." if len(row['Neighbors']) > 3 else ""))
+    
+    # Generate visualization
+    print("\n" + "=" * 70)
+    print("STEP 3: VISUALIZATION")
+    print("=" * 70)
+    print("Generating pie chart...")
+    analyzer.visualize_distribution(top_n=10, save_path="entity_distribution.png")
+    
+    # Export results to CSV
+    print("\n" + "=" * 70)
+    print("STEP 4: EXPORT RESULTS")
+    print("=" * 70)
+    analyzer.export_to_csv(
+        entities_path="entities_list.csv",
+        proximity_path="proximity_analysis.csv"
+    )
+    
+    # Summary statistics
+    print("\n" + "=" * 70)
+    print("SUMMARY STATISTICS")
+    print("=" * 70)
+    print(f"Total entities found: {len(proximity_results)}")
+    print(f"Unique brands: {entity_counts.count()}")
+    print(f"Most common brand: {entity_counts.index[0]} ({entity_counts.iloc[0]} locations)")
+    print(f"Average neighbors per location: {proximity_results['Neighbor_Count'].mean():.2f}")
+    print(f"Maximum neighbors for any location: {proximity_results['Neighbor_Count'].max()}")
+    
+    # Find locations with most neighbors (highest clustering)
+    top_clustered = proximity_results.nlargest(3, 'Neighbor_Count')[['Entity', 'Neighbor_Count']]
+    print("\nMost clustered locations:")
+    for idx, row in top_clustered.iterrows():
+        print(f"  - {row['Entity']}: {row['Neighbor_Count']} neighbors")
+    
+    print("\n" + "=" * 70)
+    print("Analysis Complete!")
+    print("=" * 70)
+    print("\nGenerated files:")
+    print("  - entity_distribution.png")
+    print("  - entities_list.csv")
+    print("  - proximity_analysis.csv")
+    print("\n")
 
-    #Gets the bounding box of the gdf GeoDataFrame
-    bounding = gdf.bounds
-    #print('Bounding:', bounding)
 
-    north, south, east, west = bounding.iloc[0, 3], bounding.iloc[0, 1], bounding.iloc[0, 2], bounding.iloc[0, 0]
-    #print('North: {},South: {},East: {},West: {}'.format(north, south, east, west))
-
-    location = gdf.unary_union
-    #print('Location:',location)
-    return north,south,east,west,location
-def area_entities_list(area,tags,output = 'yes'):
-    '''
-    Returns a dataframe of coordinates of an entity from OSM.
-    :param area(str): A location
-    :param tags(dict): key value of entity attribute in OSM and value
-    :return: results(DataFrame): table of latitude and longitude with entity value
-    '''
-    north, south, east, west,location = area_boundries(area)
-    #print(north, south, east, west)
-
-    # Find Points within the polygon
-    point = osmnx.geometries_from_bbox(north, south, east, west, tags)
-    #print('Point:', point)
-
-    point.set_crs(4326)
-    #print(point.crs)
-
-    point = point[point.geometry.within(location)]
-    point['geometry'] = point['geometry'].apply(lambda x: x.centroid if type(x) == polygon else x)
-    point = point[point.geom_type != 'MultiPolygon']
-    point = point[point.geom_type != 'Polygon']
-
-    entities_list = pd.DataFrame({'OSM Tag': list(tags.values())[0],
-                            'Brand': list(point['brand:en']),
-                            'longitude': list(point['geometry'].x),
-                            'latitude': list(point['geometry'].y)})
-
-
-    if output == 'yes':
-        entities_list = entities_list.groupby('Brand')
-        entity_list_output = entities_list.apply(print)
-        print('Entities Successfully Listed')
-    else:
-        print('Entities Successfully Identified')
-
-    return entities_list
-def area_entities_count(area,tags):
-
-    entity_list = area_entities_list(area,tags,output='no')
-    entity_count = entity_list['Brand'].value_counts()
-    print(entity_count)
-    return entity_count
-
-entities_in_area = area_entities_count(area= 'Shinjuku,Tokyo',tags={"shop":"convenience"})
-plt.pie(entities_in_area,labels=entities_in_area.values)
-plt.legend(entities_in_area.index)
-entities_list = area_entities_list(area='Shinjuku,Tokyo',tags={"shop":"convenience"},output='no')
-print( entities_list)
-#Convert location to radians
-locations = entities_list[["latitude","longitude"]].values
-locations_radians = np.radians(locations) 
-#Create a balltree to search locations
-tree = BallTree(locations_radians,leaf_size=15,metric='haversine')
-#Find Nearest neighbors in a 2 minute walking radius
-is_within, distances = tree.query_radius(locations_radians, r=168/6371000,count_only=False, return_distance=True)
-#Replace the neighbor induces with store names
-df = pd.DataFrame(is_within)
-df.columns = ['indices']
-df['indices']=[[val for val in row if val != idx] for idx,row in enumerate(df['indices'])] 
-#Create temporary index column
-entities_list = entities_list.reset_index()
-#Set Temporary Index Colimn as Index
-entities_list.set_index('index', inplace=True)
-#Replace the indices with store names
-
-df['indices'] = df['indices'].apply(lambda x: [entities_list.loc[i, 'Brand'] for i in x])
-#Print the DataFrame with store names
-print(df)
-
-#Search Criteria
+if __name__ == "__main__":
+    main()
