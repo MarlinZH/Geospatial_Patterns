@@ -179,9 +179,13 @@ Name: count, dtype: int64
 ```
 Geospatial_Patterns/
 ├── main.py                 # Main script with example usage
-├── geospatial_analysis.py  # Core analysis class (to be created)
+├── geospatial_analysis.py  # Core analysis class
+├── example_configs.py      # Pre-configured examples
 ├── requirements.txt        # Python dependencies
 ├── README.md              # This file
+├── CONTRIBUTING.md        # Contribution guidelines
+├── LICENSE                # MIT License
+├── AI_ASSISTANT_PROMPT.md # AI assistant usage guide
 ├── .gitignore             # Git ignore rules
 └── cache/                 # OSM data cache (gitignored)
 ```
@@ -203,9 +207,15 @@ The default walking radius of 168 meters represents approximately a 2-minute wal
 
 To customize: `walking_radius_meters = speed_m_per_s × time_seconds`
 
+## 🤖 Working with AI Assistants
+
+Need help with this project? Check out [AI_ASSISTANT_PROMPT.md](AI_ASSISTANT_PROMPT.md) for ready-to-use prompts that give AI assistants the context they need to help you effectively.
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ### Development Setup
 
